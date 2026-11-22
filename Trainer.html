@@ -1,0 +1,506 @@
+<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><title>Geometrie-Trainer</title><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Geometrie"><style>:root{--blue:#1f4e9c;--lb:#e8f0fc;--green:#1d7a46;--lg:#e6f5ec;--red:#b3261e;--lr:#fdeceb;--gray:#5f6672;--pink:#c2185b}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,'Segoe UI',Arial,sans-serif;font-size:18px;line-height:1.45;color:#1b1f27;margin:0;background:linear-gradient(160deg,#fdf2f8,#eef4ff)}
+#app{max-width:860px;margin:0 auto;padding:16px 16px 60px}
+h1{color:var(--blue);margin:6px 0 4px;font-size:28px}
+.sub{color:var(--gray);margin-bottom:14px}
+.ov{border-top:1.5px solid currentColor;display:inline-block;line-height:1.15;text-decoration:none}
+button,.sec{font:inherit;cursor:pointer;border:0;border-radius:12px;padding:12px 20px;background:var(--blue);color:#fff;font-weight:600;min-height:48px;text-decoration:none;display:inline-block}
+button.sec,a.sec{background:#e3e8f2;color:#223}
+button:disabled{cursor:default}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}
+.card{background:#fff;color:#1b1f27;border:2px solid #dfe5ef;border-radius:16px;padding:14px;text-align:left;position:relative;font-weight:400;min-height:130px;box-shadow:0 2px 6px rgba(30,50,90,.06)}
+.card:active{transform:scale(.98);border-color:var(--blue)}
+.card .ic{font-size:30px}
+.card b{display:block;font-size:18px;margin-top:4px}
+.card small{color:var(--gray);font-size:14px}
+.card .best{margin-top:6px;font-size:13px;color:var(--green);font-weight:600}
+.kb{position:absolute;top:10px;right:10px;font-size:12px;background:#fde7f1;color:var(--pink);border-radius:10px;padding:1px 8px;font-weight:700}
+.hint{color:var(--gray);font-size:15px;margin-top:16px}
+.top0{margin-bottom:6px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.top span{color:var(--gray);font-size:15px}
+.bar{height:8px;background:#dfe5ef;border-radius:4px;margin:10px 0 14px;overflow:hidden}
+.bar div{height:100%;background:linear-gradient(90deg,#ec4899,#1f4e9c);transition:width .3s}
+.q{background:#fff;border-radius:18px;padding:18px;box-shadow:0 2px 10px rgba(30,50,90,.08)}
+.q .p{font-size:19px;margin-bottom:10px}
+.q .p small{color:var(--gray);font-size:14px}
+.q .txt{background:#fff8e1;border-left:5px solid #f0b400;border-radius:8px;padding:10px 14px;font-size:19px;margin:6px 0 12px}
+.q .big{font-size:44px;text-align:center;margin:8px 0 14px;font-family:Georgia,serif}
+.figw{text-align:center;margin:6px 0 12px}
+svg.tf{width:100%;max-width:520px;height:auto;touch-action:manipulation;font-family:Georgia,serif}
+svg.tap{cursor:crosshair;max-width:600px}
+svg.sm{max-width:100%}
+.opts{display:grid;grid-template-columns:1fr;gap:10px}
+.opts.small{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}
+.opts.pics{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
+.opt{background:#f3f6fb;color:#1b1f27;border:2px solid #d5dce8;text-align:left;font-weight:500;font-size:18px;min-height:56px}
+.opts.pics .opt{padding:6px;text-align:center}
+.opt.ok{background:var(--lg);border-color:var(--green)}
+.opt.bad{background:var(--lr);border-color:var(--red)}
+.ans{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:center}
+.ans input{font:inherit;font-size:26px;width:130px;padding:8px 12px;border:2px solid #c7cfdc;border-radius:12px;text-align:center}
+.ans input.err{border-color:var(--red)}
+.unit{font-size:22px;color:var(--gray)}
+.fb{margin-top:14px;padding:12px 14px;border-radius:12px}
+.fb.ok{background:var(--lg);border:2px solid var(--green)}
+.fb.bad{background:var(--lr);border:2px solid var(--red)}
+.fb .ex{margin-top:6px;font-size:16px}
+.nxw{text-align:center;margin-top:14px}
+#nx{min-width:200px;font-size:20px}
+.res{text-align:center;background:#fff;border-radius:18px;padding:24px;box-shadow:0 2px 10px rgba(30,50,90,.08)}
+.res .bigem{font-size:64px}
+.rev{text-align:left;margin-top:20px;font-size:15px}
+.rev div{border-top:1px solid #e3e8f2;padding:8px 0}
+</style></head><body><div id="app"><p style="padding:20px">Der Trainer braucht JavaScript. Am iPad bitte über den Link in Safari öffnen (nicht in der Dateien-App).</p></div><script>const R=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+const pick=a=>a[R(0,a.length-1)];
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=R(0,i);[a[i],a[j]]=[a[j],a[i]];}return a;};
+const rad=d=>d*Math.PI/180;
+const INK='#1b1f27',BLUE='#1f4e9c',RED='#c0392b',GREEN='#1d7a46',ORANGE='#d35400',GRAY='#9aa3b2';
+const OV=s=>'<span class="ov">'+s+'</span>';
+const I=s=>'<i>'+s+'</i>';
+const app=document.getElementById('app');
+
+/* ------------------------------------------------ SVG-Helfer (y nach unten) */
+const f1=x=>(+x).toFixed(1);
+function svg(w,h,inner,cls,extra){return '<svg viewBox="0 0 '+w+' '+h+'" class="'+(cls||'tf')+'" '+(extra||'')+'>'+inner+'</svg>';}
+function L(x1,y1,x2,y2,c,w,dash){return '<line x1="'+f1(x1)+'" y1="'+f1(y1)+'" x2="'+f1(x2)+'" y2="'+f1(y2)+'" stroke="'+(c||INK)+'" stroke-width="'+(w||2.4)+'" stroke-linecap="round"'+(dash?' stroke-dasharray="'+dash+'"':'')+'/>';}
+function T(x,y,s,c,size,it){return '<text x="'+f1(x)+'" y="'+f1(y)+'" font-size="'+(size||17)+'" fill="'+(c||INK)+'" text-anchor="middle" dominant-baseline="central" font-family="Georgia,serif"'+(it===false?'':' font-style="italic"')+'>'+s+'</text>';}
+function X(x,y,name,dx,dy,c){const s=5;c=c||INK;return '<path d="M'+f1(x-s)+' '+f1(y-s)+'L'+f1(x+s)+' '+f1(y+s)+'M'+f1(x-s)+' '+f1(y+s)+'L'+f1(x+s)+' '+f1(y-s)+'" stroke="'+c+'" stroke-width="2.2" stroke-linecap="round"/>'+(name?T(x+(dx===undefined?12:dx),y+(dy===undefined?-12:dy),name,c):'');}
+function grid(W,H,s){let g='';for(let x=0;x<=W+.1;x+=s)g+=L(x,0,x,H,'#c9dcf2',1);for(let y=0;y<=H+.1;y+=s)g+=L(0,y,W,y,'#c9dcf2',1);return g;}
+function frame(W,H){return '<rect x="1" y="1" width="'+(W-2)+'" height="'+(H-2)+'" rx="8" fill="#fff" stroke="#aab4c5" stroke-width="1.5"/>';}
+function P(x,y,a,r){return [x+r*Math.cos(rad(a)),y-r*Math.sin(rad(a))];}
+function clip(px,py,dx,dy,W,H,m,t0,t1){
+  m=m===undefined?4:m;t0=t0===undefined?-1e9:t0;t1=t1===undefined?1e9:t1;
+  const lo=[m,m],hi=[W-m,H-m],p=[px,py],d=[dx,dy];
+  for(let i=0;i<2;i++){
+    if(Math.abs(d[i])<1e-12){if(p[i]<lo[i]||p[i]>hi[i])return null;continue;}
+    const a=(lo[i]-p[i])/d[i],b=(hi[i]-p[i])/d[i];
+    t0=Math.max(t0,Math.min(a,b));t1=Math.min(t1,Math.max(a,b));
+  }
+  if(t0>t1)return null;
+  return [px+dx*t0,py+dy*t0,px+dx*t1,py+dy*t1];
+}
+/* Gerade durch (px,py) mit Richtung in Grad (gegen den Uhrzeigersinn) */
+function gerade(px,py,ang,W,H,label,c,lt,side){
+  const dx=Math.cos(rad(ang)),dy=-Math.sin(rad(ang));const k=clip(px,py,dx,dy,W,H);if(!k)return '';
+  let s=L(k[0],k[1],k[2],k[3],c);
+  if(label){lt=lt===undefined?.9:lt;side=side||1;const x=k[0]+(k[2]-k[0])*lt,y=k[1]+(k[3]-k[1])*lt;s+=T(x-dy*14*side,y+dx*14*side,label,c);}
+  return s;
+}
+function geradeV(px,py,dx,dy,W,H,label,c,lt,side){const n=Math.hypot(dx,dy);return gerade(px,py,Math.atan2(-dy/n,dx/n)*180/Math.PI,W,H,label,c,lt,side);}
+function strahl(px,py,ang,W,H,c){const dx=Math.cos(rad(ang)),dy=-Math.sin(rad(ang));const k=clip(px,py,dx,dy,W,H,4,0);return k?L(px,py,k[2],k[3],c):'';}
+function arc(cx,cy,r,a1,sw,c,w){
+  c=c||BLUE;w=w||2.2;
+  if(sw>=359.9)return '<circle cx="'+f1(cx)+'" cy="'+f1(cy)+'" r="'+r+'" fill="none" stroke="'+c+'" stroke-width="'+w+'"/>';
+  const p1=P(cx,cy,a1,r),p2=P(cx,cy,a1+sw,r);
+  return '<path d="M'+f1(p1[0])+' '+f1(p1[1])+'A'+r+' '+r+' 0 '+(sw>180?1:0)+' 0 '+f1(p2[0])+' '+f1(p2[1])+'" fill="none" stroke="'+c+'" stroke-width="'+w+'"/>';
+}
+function rightMark(cx,cy,a1,r,c){r=r||16;c=c||BLUE;const d=P(cx,cy,a1+45,r*.45);return arc(cx,cy,r,a1,90,c)+'<circle cx="'+f1(d[0])+'" cy="'+f1(d[1])+'" r="2.2" fill="'+c+'"/>';}
+function angleFig(alpha,start,opts){
+  opts=opts||{};const W=opts.W||300,H=opts.H||230,leg=opts.leg||100;
+  let cx=W/2,cy=H/2;
+  if(alpha<=150&&!opts.center){const b=P(0,0,start+alpha/2,leg*.42);cx-=b[0];cy-=b[1];}
+  let s=frame(W,H);
+  const e1=P(cx,cy,start,leg),e2=P(cx,cy,start+alpha,leg);
+  s+=L(cx,cy,e1[0],e1[1],INK,2.6)+L(cx,cy,e2[0],e2[1],INK,2.6);
+  if(!opts.noArc){
+    if(alpha===90)s+=rightMark(cx,cy,start,20);else s+=arc(cx,cy,alpha>180?24:28,start,alpha,BLUE,2.6);
+    const lp=P(cx,cy,start+alpha/2,alpha===90?34:(alpha>180?40:44));s+=T(lp[0],lp[1],opts.letter||'α',BLUE,18);
+  }
+  return {s,cx,cy};
+}
+/* Geodreieck-Skala: Halbkreis, Basis entlang Richtung base, misst gegen den Uhrzeigersinn */
+function protractor(cx,cy,base,Rr){
+  let s='<g transform="translate('+f1(cx)+','+f1(cy)+') rotate('+(-base)+')">';
+  s+='<path d="M'+(-Rr-8)+' 0 L'+(Rr+8)+' 0 A'+(Rr+8)+' '+(Rr+8)+' 0 0 0 '+(-Rr-8)+' 0Z" fill="rgba(255,236,170,.55)" stroke="#b08900" stroke-width="1.2"/>';
+  for(let v=0;v<=180;v+=5){
+    const a=rad(v),l=v%10===0?11:6,c=Math.cos(a),sn=-Math.sin(a);
+    s+=L(Rr*c,Rr*sn,(Rr-l)*c,(Rr-l)*sn,'#6b5200',v%10===0?1.3:.8);
+    if(v%10===0){
+      const to=Rr-21,ti=Rr-36;
+      s+='<text x="'+f1(to*c)+'" y="'+f1(to*sn)+'" font-size="9.5" fill="#3d2f00" text-anchor="middle" dominant-baseline="central" transform="rotate('+(base)+' '+f1(to*c)+' '+f1(to*sn)+')">'+v+'</text>';
+      s+='<text x="'+f1(ti*c)+'" y="'+f1(ti*sn)+'" font-size="7.5" fill="#1f4e9c" text-anchor="middle" dominant-baseline="central" transform="rotate('+(base)+' '+f1(ti*c)+' '+f1(ti*sn)+')">'+(180-v)+'</text>';
+    }
+  }
+  s+='<circle cx="0" cy="0" r="2.5" fill="#b3261e"/></g>';
+  return s;
+}
+
+/* ------------------------------------------------ Fachschreibweise */
+const SYM=[['∥','ist parallel zu'],['⊥','steht normal auf'],[OV('AB'),'die Strecke AB (bzw. ihre Länge)'],[OV('P'+I('g')),'der Abstand des Punktes P von der Geraden g'],['∈','liegt auf (ist Element von)'],['∉','liegt nicht auf'],['∩','geschnitten mit (Schnittpunkt)'],['⊾','rechter Winkel (90°)']];
+function templ(){
+  const [g,h]=shuffle(['g','h','a','b','k','s','e','f']).slice(0,2);
+  const [p,q]=shuffle(['P','Q','R','M','T','K']).slice(0,2);
+  const n=R(2,9);
+  return [
+    {id:'par',t:'Die Gerade '+I(g)+' ist parallel zur Geraden '+I(h)+'.',n:I(g)+' ∥ '+I(h),bad:['nor']},
+    {id:'nor',t:'Die Gerade '+I(g)+' steht normal auf die Gerade '+I(h)+'.',n:I(g)+' ⊥ '+I(h),bad:['par']},
+    {id:'on',t:'Der Punkt '+p+' liegt auf der Geraden '+I(g)+'.',n:p+' ∈ '+I(g),bad:['off']},
+    {id:'off',t:'Der Punkt '+p+' liegt nicht auf der Geraden '+I(g)+'.',n:p+' ∉ '+I(g),bad:['on']},
+    {id:'cut',t:'Die Geraden '+I(g)+' und '+I(h)+' schneiden einander im Punkt '+q+'.',n:I(g)+' ∩ '+I(h)+' = {'+q+'}',bad:['par']},
+    {id:'len',t:'Die Strecke '+p+q+' ist '+n+' cm lang.',n:OV(p+q)+' = '+n+' cm',bad:['dist']},
+    {id:'dist',t:'Der Punkt '+p+' hat von der Geraden '+I(g)+' den Abstand '+n+' cm.',n:OV(p+I(g))+' = '+n+' cm',bad:['len']},
+  ];
+}
+function mcFrom(correct,wrongs,k){const opts=[correct,...shuffle(wrongs.filter(w=>w!==correct)).slice(0,k||3)];const idx=shuffle(opts.map((_,i)=>i));return {options:idx.map(i=>opts[i]),correct:idx.indexOf(0)};}
+function symQ(){
+  const r=Math.random();
+  if(r<.3){
+    const i=R(0,SYM.length-1);const m=mcFrom(SYM[i][1],SYM.map(s=>s[1]));
+    return {kind:'mc',prompt:'Was bedeutet dieses Zeichen?',big:SYM[i][0],...m,expl:SYM[i][0]+' bedeutet: <b>'+SYM[i][1]+'</b>.'};
+  }
+  const ts=templ(),t=pick(ts);
+  const bad=ts.filter(x=>t.bad.includes(x.id)),rest=shuffle(ts.filter(x=>x!==t&&!t.bad.includes(x.id)));
+  const wr=[...bad,...rest].slice(0,3);
+  if(r<.7){const m=mcFrom(t.n,wr.map(x=>x.n));return {kind:'mc',prompt:'Wie schreibt man das in Fachschreibweise?',text:t.t,...m,expl:'Richtig: <b>'+t.n+'</b>'};}
+  const m=mcFrom(t.t,wr.map(x=>x.t));return {kind:'mc',prompt:'Was bedeutet das?',big:t.n,...m,expl:t.n+' heißt: '+t.t};
+}
+
+/* ------------------------------------------------ Strecke, Strahl, Gerade */
+function ssgFig(type,W,H){
+  W=W||300;H=H||150;
+  let A,B;do{A=[R(50,120),R(30,H-30)];B=[R(170,250),R(30,H-30)];}while(Math.hypot(B[0]-A[0],B[1]-A[1])<110);
+  if(Math.random()<.5){const t=A;A=B;B=t;}
+  const dx=B[0]-A[0],dy=B[1]-A[1];let s=frame(W,H);
+  if(type==='Strecke')s+=L(A[0],A[1],B[0],B[1]);
+  else if(type==='Strahl'){const k=clip(A[0],A[1],dx,dy,W,H,3,0);s+=L(A[0],A[1],k[2],k[3]);}
+  else{const k=clip(A[0],A[1],dx,dy,W,H,3);s+=L(k[0],k[1],k[2],k[3]);}
+  s+=X(A[0],A[1],'A',0,-16)+X(B[0],B[1],'B',0,-16);
+  return svg(W,H,s);
+}
+function ssgQ(){
+  if(Math.random()<.65){
+    const type=pick(['Strecke','Strahl','Gerade']);
+    const m=mcFrom(type,['Strecke','Strahl','Gerade'],2);
+    m.options=['Strecke','Strahl','Gerade'];m.correct=m.options.indexOf(type);
+    const why={Strecke:'Sie hört bei A <b>und</b> bei B auf – 2 Endpunkte. Man kann sie messen: '+OV('AB')+'.',Strahl:'Sie beginnt bei einem Punkt (Anfangspunkt) und geht auf der anderen Seite unendlich weiter.',Gerade:'Sie geht auf <b>beiden</b> Seiten unendlich weiter – keine Endpunkte.'};
+    return {kind:'mc',prompt:'Ist das eine Strecke, ein Strahl oder eine Gerade? <small>(Linien, die bis zum Rand gehen, gehen unendlich weiter.)</small>',fig:ssgFig(type),...m,expl:why[type]};
+  }
+  const F=[
+    ['Wie viele Endpunkte hat eine Strecke?','2',['0','1','unendlich viele']],
+    ['Wie viele Endpunkte hat ein Strahl?','1 (den Anfangspunkt)',['0','2','unendlich viele']],
+    ['Wie viele Endpunkte hat eine Gerade?','keinen',['1','2','4']],
+    ['Welche Linie kann man mit dem Lineal <b>messen</b>?','die Strecke',['den Strahl','die Gerade','alle drei']],
+    ['Was ist ein Strahl?','eine Linie mit Anfangspunkt, die auf einer Seite unendlich weitergeht',['eine Linie mit zwei Endpunkten','eine Linie ohne Endpunkte','eine gebogene Linie']],
+    ['Durch zwei Punkte A und B gibt es wie viele Geraden?','genau eine',['keine','zwei','unendlich viele']],
+    ['Wie schreibt man „die Strecke von A nach B“?',OV('AB'),['A ∈ B','A ∥ B','A ⊥ B']],
+    ['Wie heißen die Begrenzungspunkte einer Strecke?','Endpunkte',['Schnittpunkte','Mittelpunkte','Scheitel']],
+  ];
+  const f=pick(F);const m=mcFrom(f[1],f[2]);
+  return {kind:'mc',prompt:f[0],...m,expl:'Richtig: <b>'+f[1]+'</b>. Strecke: 2 Endpunkte · Strahl: 1 Anfangspunkt · Gerade: keine Endpunkte.'};
+}
+
+/* ------------------------------------------------ parallel / normal */
+const DIRS=[[1,0],[0,1],[1,1],[1,-1],[2,1],[1,2],[2,-1],[1,-2],[3,1],[1,3]];
+const cross=(a,b)=>a[0]*b[1]-a[1]*b[0],dot=(a,b)=>a[0]*b[0]+a[1]*b[1];
+function twoLines(rel,W,H,S){
+  W=W||300;H=H||200;S=S||20;
+  const d1=pick(DIRS);let d2;
+  if(rel==='par')d2=d1;else if(rel==='nor')d2=[-d1[1],d1[0]];else{do{d2=pick(DIRS);}while(cross(d1,d2)===0||dot(d1,d2)===0);}
+  const C=[R(6,9),R(4,6)];let p1=C,p2=C;
+  if(rel==='par'){const k=Math.abs(d1[0])+Math.abs(d1[1])>2?1:2;const o=[-d1[1]*k,d1[0]*k];p1=[C[0]+o[0],C[1]+o[1]];p2=[C[0]-o[0],C[1]-o[1]];}
+  let s=frame(W,H)+grid(W,H,S);
+  s+=geradeV(p1[0]*S,p1[1]*S,d1[0],d1[1],W,H,'g',INK,.92)+geradeV(p2[0]*S,p2[1]*S,d2[0],d2[1],W,H,'h',INK,.08);
+  return svg(W,H,s);
+}
+function pnQ(){
+  if(Math.random()<.7){
+    const rel=pick(['par','nor','x']);
+    const opts=['parallel ('+I('g')+' ∥ '+I('h')+')','normal ('+I('g')+' ⊥ '+I('h')+')','schneidend, aber nicht normal'];
+    const c={par:0,nor:1,x:2}[rel];
+    const ex={par:'Gleiche Richtung (zähle die Kästchen!) – sie schneiden einander nie.',nor:'Sie schneiden einander im <b>rechten Winkel</b> (90°). Tipp: Leg dein Geodreieck an.',x:'Sie schneiden einander, aber nicht im rechten Winkel.'};
+    return {kind:'mc',prompt:'Wie liegen die Geraden '+I('g')+' und '+I('h')+' zueinander?',fig:twoLines(rel),options:opts,correct:c,expl:ex[rel]};
+  }
+  const F=[
+    [I('a')+' ∥ '+I('b')+' und '+I('b')+' ∥ '+I('c')+'. Dann gilt:',I('a')+' ∥ '+I('c'),[I('a')+' ⊥ '+I('c'),'man weiß es nicht']],
+    [I('a')+' ⊥ '+I('b')+' und '+I('b')+' ⊥ '+I('c')+'. Dann gilt:',I('a')+' ∥ '+I('c'),[I('a')+' ⊥ '+I('c'),'man weiß es nicht']],
+    [I('a')+' ∥ '+I('b')+' und '+I('c')+' ⊥ '+I('a')+'. Dann gilt:',I('c')+' ⊥ '+I('b'),[I('c')+' ∥ '+I('b'),'man weiß es nicht']],
+    ['Wie viele gemeinsame Punkte haben zwei parallele Geraden (die nicht zusammenfallen)?','keinen',['genau einen','zwei']],
+    ['Welchen Winkel schließen zwei normale Geraden ein?','90°',['180°','0°','45°']],
+    ['Wie zeichnet man die Normale zu '+I('g')+' mit dem Geodreieck?','Mittellinie (durch 0) auf '+I('g')+' legen, entlang der langen Kante zeichnen',['lange Kante auf '+I('g')+' legen und daneben zeichnen','irgendwie schräg zeichnen']],
+    ['Was bedeutet „normal“ in der Geometrie?','im rechten Winkel (90°)',['ganz gewöhnlich','parallel','schräg']],
+  ];
+  const f=pick(F);const m=mcFrom(f[1],f[2]);
+  return {kind:'mc',prompt:f[0],...m,expl:'Richtig: <b>'+f[1]+'</b>. Merke: Zwei Normalen auf dieselbe Gerade sind parallel zueinander.'};
+}
+
+/* ------------------------------------------------ parallel verschieben */
+function dirTxt(tx,ty){const a=[];if(tx)a.push(Math.abs(tx)+' Kästchen nach '+(tx>0?'rechts':'links'));if(ty)a.push(Math.abs(ty)+' Kästchen nach '+(ty<0?'oben':'unten'));return a.join(' und ');}
+function shiftTapQ(){
+  const W=320,H=240,S=20;let A,B,t;
+  for(;;){A=[R(2,8),R(2,10)];B=[A[0]+R(2,4),A[1]+pick([-3,-2,-1,1,2,3])];t=[pick([-6,-5,-4,-3,3,4,5,6]),pick([-4,-3,-2,0,2,3,4])];
+    const pts=[A,B,[A[0]+t[0],A[1]+t[1]],[B[0]+t[0],B[1]+t[1]]];if(pts.every(p=>p[0]>=1&&p[0]<=15&&p[1]>=1&&p[1]<=11))break;}
+  const which=Math.random()<.5?'A':'B';const src=which==='A'?A:B;const tgt=[src[0]+t[0],src[1]+t[1]];
+  const base=frame(W,H)+grid(W,H,S)+L(A[0]*S,A[1]*S,B[0]*S,B[1]*S,INK,3)+X(A[0]*S,A[1]*S,'A',-12,-12)+X(B[0]*S,B[1]*S,'B',12,-12);
+  return {kind:'tap',W,H,S,prompt:'Verschiebe die Strecke '+OV('AB')+' um <b>'+dirTxt(t[0],t[1])+'</b>. Tippe auf den Gitterpunkt, wo <b>'+which+'\'</b> landet.',
+    fig:svg(W,H,base,'tf tap','id="tapsvg"'),
+    judge:(x,y)=>x===tgt[0]&&y===tgt[1],
+    reveal:(x,y)=>svg(W,H,base+L(src[0]*S,src[1]*S,tgt[0]*S,tgt[1]*S,ORANGE,1.6,'5,4')+L((A[0]+t[0])*S,(A[1]+t[1])*S,(B[0]+t[0])*S,(B[1]+t[1])*S,GREEN,3)+X((A[0]+t[0])*S,(A[1]+t[1])*S,"A'",-14,-12,GREEN)+X((B[0]+t[0])*S,(B[1]+t[1])*S,"B'",14,-12,GREEN)+'<circle cx="'+x*S+'" cy="'+y*S+'" r="7" fill="none" stroke="'+(x===tgt[0]&&y===tgt[1]?GREEN:RED)+'" stroke-width="3"/>'),
+    show:which+'\' liegt '+dirTxt(t[0],t[1])+' von '+which+'.',
+    expl:'Jeder Punkt wandert gleich weit. Die neue Strecke ist <b>parallel</b> und <b>gleich lang</b>: '+OV('AB')+' ∥ '+OV("A'B'")+'.'};
+}
+function shiftMcQ(){
+  const S=16,W=224,H=224;const A=[2,7];const v=[R(2,4),pick([-3,-2,2,3])];
+  const B=[A[0]+v[0],A[1]+v[1]];const t=[R(4,6),pick([-1,1])];
+  const cands=[{v:v},{v:[v[0]+1,v[1]]},{v:[v[0],-v[1]]},{v:-v[1]===v[0]?[v[0]-1,v[1]]:[-v[1],v[0]]}];
+  const opts=shuffle(cands.map((c,i)=>i));
+  const pic=c=>{const A2=[A[0]+t[0],A[1]+t[1]],B2=[A2[0]+c.v[0],A2[1]+c.v[1]];
+    return svg(W,H,frame(W,H)+grid(W,H,S)+L(A[0]*S,A[1]*S,B[0]*S,B[1]*S,GRAY,3)+T(A[0]*S-9,A[1]*S-9,'A',GRAY,13)+T(B[0]*S+9,B[1]*S-9,'B',GRAY,13)+L(A2[0]*S,A2[1]*S,B2[0]*S,B2[1]*S,GREEN,3)+T(A2[0]*S-10,A2[1]*S-9,"A'",GREEN,13)+T(B2[0]*S+11,B2[1]*S-9,"B'",GREEN,13),'tf sm');};
+  return {kind:'mc',prompt:'In welchem Bild wurde '+OV('AB')+' richtig <b>parallel verschoben</b>? (grau = vorher, grün = nachher)',options:opts.map(i=>pic(cands[i])),correct:opts.indexOf(0),optCls:'pics',
+    expl:'Richtig verschoben heißt: <b>gleiche Richtung</b> (parallel) und <b>gleich lang</b>. Zähle die Kästchen von A\' nach B\' – es müssen gleich viele sein wie von A nach B.'};
+}
+function shiftQ(){return Math.random()<.6?shiftTapQ():shiftMcQ();}
+
+/* ------------------------------------------------ Lage */
+function lageQ(){
+  const r=Math.random(),W=300,H=180;
+  if(r<.4){
+    const a=R(-35,35),cx=150,cy=90,dx=Math.cos(rad(a)),dy=-Math.sin(rad(a));
+    const on=Math.random()<.5,t=R(-90,90),off=on?0:pick([-1,1])*R(16,34);
+    const px=cx+dx*t-dy*off,py=cy+dy*t+dx*off;const nm=pick(['P','Q','R','M']);
+    const fig=svg(W,H,frame(W,H)+gerade(cx,cy,a,W,H,'g',INK,.06)+X(px,py,nm,0,-17));
+    return {kind:'mc',prompt:'Wo liegt der Punkt '+nm+'?',fig,options:[nm+' ∈ '+I('g')+' (liegt auf '+I('g')+')',nm+' ∉ '+I('g')+' (liegt nicht auf '+I('g')+')'],correct:on?0:1,
+      expl:on?nm+' liegt genau auf der Geraden: '+nm+' ∈ '+I('g')+'.':nm+' liegt neben der Geraden: '+nm+' ∉ '+I('g')+'.'};
+  }
+  if(r<.75){
+    const k=pick(['par','x','nor']),a1=R(-30,30),cx=150,cy=90;let s=frame(W,H);
+    if(k==='par'){const o=R(22,30),dx=Math.cos(rad(a1)),dy=-Math.sin(rad(a1));s+=gerade(cx+dy*o,cy-dx*o,a1,W,H,'g',INK,.06)+gerade(cx-dy*o,cy+dx*o,a1,W,H,'h',INK,.06);}
+    else{const a2=k==='nor'?a1+90:a1+pick([1,-1])*R(30,60);s+=gerade(cx,cy,a1,W,H,'g',INK,.06)+gerade(cx,cy,a2,W,H,'h',INK,.92);}
+    const opts=['parallel – kein gemeinsamer Punkt','schneidend (nicht normal) – ein Schnittpunkt','normal – ein Schnittpunkt mit 90°'];
+    return {kind:'mc',prompt:'Wie liegen '+I('g')+' und '+I('h')+' zueinander?',fig:svg(W,H,s),options:opts,correct:{par:0,x:1,nor:2}[k],expl:'Zwei Geraden sind entweder <b>parallel</b> (0 gemeinsame Punkte), <b>schneidend</b> (1 Punkt; Sonderfall <b>normal</b> mit 90°) oder <b>zusammenfallend</b> (alle Punkte gemeinsam).'};
+  }
+  const F=[
+    ['Zwei Geraden haben <b>genau einen</b> gemeinsamen Punkt. Sie sind …','schneidend',['parallel','zusammenfallend']],
+    ['Zwei Geraden haben <b>keinen</b> gemeinsamen Punkt. Sie sind …','parallel',['schneidend','zusammenfallend']],
+    ['Zwei Geraden haben <b>unendlich viele</b> gemeinsame Punkte. Sie sind …','zusammenfallend (identisch)',['parallel','schneidend']],
+    ['Wie heißt der gemeinsame Punkt zweier schneidender Geraden?','Schnittpunkt',['Endpunkt','Anfangspunkt','Scheitel']],
+    ['Wie schreibt man „S ist der Schnittpunkt von '+I('g')+' und '+I('h')+'“?',I('g')+' ∩ '+I('h')+' = {S}',[I('g')+' ∥ '+I('h')+' = S','S ∉ '+I('g'),I('g')+' ⊥ S']],
+    ['S ist der Schnittpunkt von '+I('g')+' und '+I('h')+'. Was stimmt?','S ∈ '+I('g')+' und S ∈ '+I('h'),['S ∉ '+I('g')+' und S ∈ '+I('h'),'S ∉ '+I('g')+' und S ∉ '+I('h')]],
+  ];
+  const f=pick(F);const m=mcFrom(f[1],f[2]);return {kind:'mc',prompt:f[0],...m,expl:'Richtig: <b>'+f[1]+'</b>.'};
+}
+
+/* ------------------------------------------------ Normalabstand */
+function distNumQ(){
+  const W=300,H=220,S=20;const hor=Math.random()<.5;let s=frame(W,H)+grid(W,H,S);let k,fig2,txt;
+  if(Math.random()<.65){
+    const gl=hor?R(2,9):R(2,13);k=R(2,6);let p;
+    if(hor){const side=gl+k<=10?1:-1;p=[R(2,13),gl+side*k];s+=L(4,gl*S,W-4,gl*S)+T(18,gl*S-12,'g');}
+    else{const side=gl+k<=14?1:-1;p=[gl+side*k,R(2,9)];s+=L(gl*S,4,gl*S,H-4)+T(gl*S+12,16,'g');}
+    if(p[0]<1||p[0]>14||p[1]<1||p[1]>10)return distNumQ();
+    const F=hor?[p[0],gl]:[gl,p[1]];
+    fig2=s+L(p[0]*S,p[1]*S,F[0]*S,F[1]*S,RED,3)+X(p[0]*S,p[1]*S,'P',14,-12);s+=X(p[0]*S,p[1]*S,'P',14,-12);
+    txt='Wie viele Kästchen ist der Punkt P von der Geraden '+I('g')+' entfernt? (Normalabstand '+OV('P'+I('g'))+')';
+  }else{
+    const g1=hor?R(2,5):R(2,6);k=R(2,5);const g2=g1+k;
+    if(hor)s+=L(4,g1*S,W-4,g1*S)+T(18,g1*S-12,'g')+L(4,g2*S,W-4,g2*S)+T(18,g2*S-12,'h');
+    else s+=L(g1*S,4,g1*S,H-4)+T(g1*S+12,16,'g')+L(g2*S,4,g2*S,H-4)+T(g2*S+12,16,'h');
+    const c=R(4,10);fig2=s+(hor?L(c*S,g1*S,c*S,g2*S,RED,3):L(g1*S,c*S/1.5,g2*S,c*S/1.5,RED,3));
+    txt='Wie viele Kästchen beträgt der Abstand der parallelen Geraden '+I('g')+' und '+I('h')+'?';
+  }
+  return {kind:'num',prompt:txt,fig:svg(W,H,s),reveal:svg(W,H,fig2),ans:k,tol:0,unit:'Kästchen',show:k+' Kästchen',expl:'Der Abstand wird immer <b>normal</b> (im rechten Winkel) gemessen – das ist der kürzeste Weg.'};
+}
+function distTapQ(){
+  const W=320,H=240,S=20;const d=pick(DIRS.slice(0,8));const n=[-d[1],d[0]];
+  let F,k,Pp;for(;;){F=[R(4,12),R(3,9)];k=pick(Math.abs(n[0])+Math.abs(n[1])>1?[1,2,-1,-2]:[2,3,4,-2,-3,-4]);Pp=[F[0]+n[0]*k,F[1]+n[1]*k];if(Pp[0]>=1&&Pp[0]<=15&&Pp[1]>=1&&Pp[1]<=11)break;}
+  const base=frame(W,H)+grid(W,H,S)+geradeV(F[0]*S,F[1]*S,d[0],d[1],W,H,'g',INK,.05)+X(Pp[0]*S,Pp[1]*S,'P',14,-12);
+  const ang=Math.atan2(-d[1],d[0])*180/Math.PI;const pa=Math.atan2(-(Pp[1]-F[1]),Pp[0]-F[0])*180/Math.PI;
+  let a1=ang;if(((pa-ang)%360+360)%360>180)a1=ang+180;
+  return {kind:'tap',W,H,S,prompt:'Tippe auf den <b>Fußpunkt F</b>: dort, wo der Normalabstand von P die Gerade '+I('g')+' trifft.',
+    fig:svg(W,H,base,'tf tap','id="tapsvg"'),judge:(x,y)=>x===F[0]&&y===F[1],
+    reveal:(x,y)=>svg(W,H,base+L(Pp[0]*S,Pp[1]*S,F[0]*S,F[1]*S,RED,3)+rightMark(F[0]*S,F[1]*S,a1,16,RED)+X(F[0]*S,F[1]*S,'F',-14,14,RED)+'<circle cx="'+x*S+'" cy="'+y*S+'" r="7" fill="none" stroke="'+(x===F[0]&&y===F[1]?GREEN:ORANGE)+'" stroke-width="3"/>'),
+    show:'F (rot eingezeichnet)',expl:'Leg die <b>Mittellinie</b> des Geodreiecks auf '+I('g')+' und schieb es, bis die lange Kante durch P geht. Wo die Kante '+I('g')+' trifft, ist F.'};
+}
+function distMcQ(){
+  const W=300,H=190,a=R(-20,20),cx=150,cy=135,dx=Math.cos(rad(a)),dy=-Math.sin(rad(a));
+  const h=R(70,95),t0=R(-30,30);const Fp=[cx+dx*t0,cy+dy*t0],Pp=[Fp[0]+dy*h,Fp[1]-dx*h];
+  const offs=shuffle([0,pick([-70,-55]),pick([55,70])]);let s=frame(W,H)+gerade(cx,cy,a,W,H,'g',INK,.04,-1);
+  offs.forEach((o,i)=>{const Q=[Fp[0]+dx*o,Fp[1]+dy*o];s+=L(Pp[0],Pp[1],Q[0],Q[1],[BLUE,ORANGE,GREEN][i],2.6);s+=T(Pp[0]+(Q[0]-Pp[0])*.62+(o===0?12:(o<0?-12:12)),Pp[1]+(Q[1]-Pp[1])*.62,String(i+1),[BLUE,ORANGE,GREEN][i],17,false);});
+  s+=X(Pp[0],Pp[1],'P',0,-16);
+  return {kind:'mc',prompt:'Welche Strecke zeigt den <b>Normalabstand</b> von P zur Geraden '+I('g')+'?',fig:svg(W,H,s),options:['1','2','3'],correct:offs.indexOf(0),expl:'Der Normalabstand steht <b>im rechten Winkel</b> auf '+I('g')+' und ist die <b>kürzeste</b> Strecke.'};
+}
+function distQ(){const r=Math.random();return r<.4?distNumQ():r<.75?distTapQ():distMcQ();}
+
+/* ------------------------------------------------ Winkelarten */
+const ARTEN=['Nullwinkel','spitzer Winkel','rechter Winkel','stumpfer Winkel','gestreckter Winkel','erhabener Winkel','voller Winkel'];
+function art(a){return a===0?ARTEN[0]:a<90?ARTEN[1]:a===90?ARTEN[2]:a<180?ARTEN[3]:a===180?ARTEN[4]:a<360?ARTEN[5]:ARTEN[6];}
+const RANGE={'Nullwinkel':'genau 0°','spitzer Winkel':'größer als 0° und kleiner als 90°','rechter Winkel':'genau 90°','stumpfer Winkel':'größer als 90° und kleiner als 180°','gestreckter Winkel':'genau 180°','erhabener Winkel':'größer als 180° und kleiner als 360°','voller Winkel':'genau 360°'};
+function randAngle(kind){return {s:5*R(2,16),r:90,t:5*R(19,35),g:180,e:5*R(38,70)}[kind];}
+function wartQ(){
+  const r=Math.random();
+  if(r<.5){
+    const a=randAngle(pick(['s','r','t','g','e','s','t','e']));const st=R(0,11)*30+R(-10,10);
+    const opts=ARTEN.slice(1,6);const f=angleFig(a,st);
+    return {kind:'mc',prompt:'Welche Winkelart ist der blau markierte Winkel α?',fig:svg(300,230,f.s),options:opts,correct:opts.indexOf(art(a)),expl:'α ≈ '+a+'°. Ein '+art(a)+' ist '+RANGE[art(a)]+'.'};
+  }
+  if(r<.8){
+    const a=pick([0,360,90,180,5*R(1,17),5*R(19,35),5*R(37,71),pick([1,89,91,179,181,359])]);
+    const opts=ARTEN.slice();
+    return {kind:'mc',prompt:'Welche Winkelart hat <b>'+a+'°</b>?',options:opts,correct:opts.indexOf(art(a)),optCls:'small',expl:'Ein '+art(a)+' ist '+RANGE[art(a)]+'.'};
+  }
+  const F=[
+    ['Wie viele Grad hat ein voller Winkel?','360°',['180°','90°','100°']],
+    ['Zwei rechte Winkel zusammen ergeben einen …','gestreckten Winkel',['vollen Winkel','spitzen Winkel','stumpfen Winkel']],
+    ['Ein gestreckter Winkel sieht aus wie …','eine gerade Linie (180°)',['ein L (90°)','ein Kreis (360°)','ein V (spitz)']],
+    ['Wie heißt der Punkt, an dem die zwei Schenkel eines Winkels beginnen?','Scheitel',['Schnittpunkt','Endpunkt','Mittelpunkt']],
+    ['Wie heißen die zwei Strahlen, die einen Winkel bilden?','Schenkel',['Seiten','Geraden','Strecken']],
+    ['Welcher Winkel ist stumpf?',String(5*R(19,35))+'°',[String(5*R(2,17))+'°','90°',String(5*R(37,70))+'°']],
+    ['Welcher Winkel ist spitz?',String(5*R(2,17))+'°',[String(5*R(19,35))+'°','180°',String(5*R(37,70))+'°']],
+    ['Welcher Winkel ist erhaben?',String(5*R(37,70))+'°',[String(5*R(19,35))+'°','180°',String(5*R(2,17))+'°']],
+  ];
+  const f=pick(F);const m=mcFrom(f[1],f[2]);return {kind:'mc',prompt:f[0],...m,expl:'Richtig: <b>'+f[1]+'</b>.'};
+}
+
+/* ------------------------------------------------ Winkel messen / schätzen */
+function wmessQ(){
+  const a=pick([5*R(4,34),5*R(4,34),5*R(38,68)]);const st=R(0,23)*15;const W=320,H=320;
+  const g=angleFig(a,st,{W,H,leg:140,center:true});
+  const base=a<=180?st:st+a;
+  const fig=svg(W,H,g.s+protractor(g.cx,g.cy,base,118));
+  const tip=a>180?'Das ist ein <b>erhabener</b> Winkel! Das Geodreieck misst den kleinen Winkel ('+(360-a)+'°). Rechne: 360° − '+(360-a)+'° = <b>'+a+'°</b>.':
+    'Lies auf der Skala ab, die beim Schenkel unter der Kante mit <b>0</b> beginnt. Kontrolle: '+(a<90?'spitz → unter 90°':a===90?'rechter Winkel → 90°':'stumpf → über 90°')+'.';
+  return {kind:'num',prompt:'Wie groß ist der Winkel α? Schau, wo der <b>Bogen</b> ist! Lies am Geodreieck ab und tippe die Gradzahl ein.',fig,ans:a,tol:2,unit:'°',show:a+'°',expl:tip};
+}
+function wschaetzQ(){
+  const a=pick([5*R(3,34),5*R(3,34),5*R(38,68),90,180]);const st=R(0,11)*30;const f=angleFig(a,st);
+  return {kind:'num',prompt:'<b>Schätze</b> den Winkel α (ohne Geodreieck). Bis 15° daneben zählt als richtig.',fig:svg(300,230,f.s),ans:a,tol:15,unit:'°',show:a+'°',
+    expl:'Hilfe beim Schätzen: Vergleiche mit 90° (Ecke eines Blattes) und 180° (gerade Linie). Die Hälfte von 90° sind 45°.'};
+}
+
+/* ------------------------------------------------ Angaben genau lesen */
+const LW=200,LH=130;
+function lPic(inner){return svg(LW,LH,frame(LW,LH)+inner,'tf sm');}
+function lesenSSG(){
+  const want=pick(['Strecke','Strahl','Gerade']);const A=[55,85],B=[145,45];const dx=B[0]-A[0],dy=B[1]-A[1];
+  const pic=t=>{let s='';if(t==='Strecke')s=L(A[0],A[1],B[0],B[1]);else if(t==='Strahl'){const k=clip(A[0],A[1],dx,dy,LW,LH,3,0);s=L(A[0],A[1],k[2],k[3]);}else{const k=clip(A[0],A[1],dx,dy,LW,LH,3);s=L(k[0],k[1],k[2],k[3]);}return lPic(s+X(A[0],A[1],'A',-4,16)+X(B[0],B[1],'B',4,16));};
+  const txt={Strecke:'Zeichne die <u>Strecke</u> '+OV('AB')+'.',Strahl:'Zeichne den <u>Strahl</u> mit dem Anfangspunkt A, der durch B geht.',Gerade:'Zeichne die <u>Gerade</u> durch A und B.'};
+  const o=shuffle(['Strecke','Strahl','Gerade']);
+  return {kind:'mc',prompt:'Welche Zeichnung passt <b>genau</b> zur Angabe?',text:txt[want],options:o.map(pic),correct:o.indexOf(want),optCls:'pics',expl:'Achte auf das Schlüsselwort: <b>'+want+'</b>.'};
+}
+function lesenPN(){
+  const want=pick(['normal','parallel']);const a=R(-15,15),gx=100,gy=95,P=[115,40];const dx=Math.cos(rad(a)),dy=-Math.sin(rad(a));
+  const base=gerade(gx,gy,a,LW,LH,'g',INK,.05,-1);
+  const pics={normal:base+gerade(P[0],P[1],a+90,LW,LH,'',RED)+X(P[0],P[1],'P',14,-6),parallel:base+gerade(P[0],P[1],a,LW,LH,'',RED)+X(P[0],P[1],'P',14,-12),wrong:base+gerade(P[0]-50,P[1],a+90,LW,LH,'',RED)+X(P[0],P[1],'P',14,-12)};
+  const o=shuffle(['normal','parallel','wrong']);
+  return {kind:'mc',prompt:'Welche rote Linie passt <b>genau</b> zur Angabe?',text:'Zeichne durch P die <u>'+(want==='normal'?'Normale':'Parallele')+'</u> zu '+I('g')+'.',options:o.map(k=>lPic(pics[k])),correct:o.indexOf(want),optCls:'pics',
+    expl:(want==='normal'?'Normale = rechter Winkel zu '+I('g'):'Parallele = gleiche Richtung wie '+I('g'))+' – und sie muss <b>durch P</b> gehen!'};
+}
+function lesenW(){
+  const want=pick(['spitz','stumpf','erhaben','recht']);const val={spitz:5*R(6,15),stumpf:5*R(22,32),erhaben:5*R(44,62),recht:90};
+  const others=shuffle(Object.keys(val).filter(k=>k!==want)).slice(0,2);const o=shuffle([want,...others]);
+  const pic=k=>{const f=angleFig(val[k],R(0,3)*20,{W:LW,H:LH,leg:55});return svg(LW,LH,f.s,'tf sm');};
+  const name={spitz:'spitzen',stumpf:'stumpfen',erhaben:'erhabenen',recht:'rechten'};
+  return {kind:'mc',prompt:'Welcher Winkel passt zur Angabe?',text:'Zeichne einen <u>'+name[want]+'</u> Winkel α.',options:o.map(pic),correct:o.indexOf(want),optCls:'pics',expl:'Ein '+art(val[want])+' ist '+RANGE[art(val[want])]+'.'};
+}
+function lesenText(){
+  const F=[
+    ['In der Angabe steht „normal“. Was musst du zeichnen?','einen rechten Winkel (90°)',['eine Parallele','irgendeine Linie']],
+    ['Angabe: „Miss den <u>Abstand</u> von P zu '+I('g')+'.“ Wie misst du?','im rechten Winkel zu '+I('g')+' (kürzester Weg)',['schräg zum nächsten Kästchen','entlang von '+I('g')]],
+    ['Angabe: „Zeichne '+OV('AB')+' = 5 cm.“ Was zeichnest du?','eine Strecke, genau 5 cm lang, mit A und B beschriftet',['eine Gerade durch A und B','einen Strahl von A aus']],
+    ['Was machst du <b>zuerst</b>, wenn du eine lange Angabe bekommst?','ganz lesen und die Schlüsselwörter unterstreichen',['sofort losfangen zu zeichnen','nur die erste Zeile lesen']],
+    ['Die Angabe hat die Teile a), b) und c). Was ist am Ende wichtig?','prüfen, ob alle Teile erledigt und beschriftet sind',['nur a) muss gemacht werden','die Zeichnung muss bunt sein']],
+    ['Angabe: „Zeichne einen Winkel mit 200°.“ Welche Winkelart ist das?','erhabener Winkel',['stumpfer Winkel','gestreckter Winkel']],
+  ];
+  const f=pick(F);const m=mcFrom(f[1],f[2]);return {kind:'mc',prompt:f[0],...m,expl:'Richtig: <b>'+f[1]+'</b>. Tipp: Unterstreiche Schlüsselwörter wie Strecke, Strahl, Gerade, normal, parallel, Abstand und Winkelart.'};
+}
+function lesenQ(){return pick([lesenSSG,lesenPN,lesenW,lesenText,lesenPN,lesenW])();}
+
+/* ------------------------------------------------ Wahr oder Falsch */
+const WF=[
+  ['Eine Strecke hat zwei Endpunkte.',1,'Richtig – darum kann man sie messen.'],
+  ['Eine Gerade kann man mit dem Lineal messen.',0,'Falsch – eine Gerade ist unendlich lang.'],
+  ['Ein Strahl hat einen Anfangspunkt.',1,'Richtig.'],
+  [''+I('g')+' ⊥ '+I('h')+' bedeutet: '+I('g')+' ist parallel zu '+I('h')+'.',0,'Falsch – ⊥ heißt <b>normal</b> (90°). Parallel ist ∥.'],
+  ['P ∉ '+I('g')+' bedeutet: P liegt nicht auf '+I('g')+'.',1,'Richtig.'],
+  ['Parallele Geraden haben überall den gleichen Abstand.',1,'Richtig.'],
+  ['Zwei parallele Geraden schneiden einander irgendwann.',0,'Falsch – sie haben keinen gemeinsamen Punkt.'],
+  ['Ein stumpfer Winkel ist größer als 90° und kleiner als 180°.',1,'Richtig.'],
+  ['Ein Winkel mit 90° ist ein spitzer Winkel.',0,'Falsch – 90° ist ein <b>rechter</b> Winkel.'],
+  ['Ein erhabener Winkel ist größer als 180°.',1,'Richtig – zwischen 180° und 360°.'],
+  ['Der Normalabstand ist die kürzeste Verbindung zwischen Punkt und Gerade.',1,'Richtig.'],
+  ['Den Abstand von P zu '+I('g')+' darf man schräg messen.',0,'Falsch – immer <b>normal</b> (rechter Winkel).'],
+  ['Beim parallelen Verschieben bleibt eine Strecke gleich lang.',1,'Richtig – und sie bleibt parallel.'],
+  ['Wenn '+I('a')+' ⊥ '+I('b')+' und '+I('b')+' ⊥ '+I('c')+', dann ist '+I('a')+' ⊥ '+I('c')+'.',0,'Falsch – dann ist '+I('a')+' ∥ '+I('c')+'.'],
+  ['Das Zeichen ⊾ bedeutet rechter Winkel.',1,'Richtig.'],
+  [OV('AB')+' bedeutet die Strecke von A nach B.',1,'Richtig.'],
+  ['Ein gestreckter Winkel hat 180°.',1,'Richtig.'],
+  ['Das Geodreieck hat nur eine Gradskala.',0,'Falsch – es hat <b>zwei</b> Skalen. Immer die nehmen, die beim ersten Schenkel mit 0 beginnt.'],
+  ['Der Schnittpunkt S von '+I('g')+' und '+I('h')+' liegt auf beiden Geraden.',1,'Richtig: S ∈ '+I('g')+' und S ∈ '+I('h')+'.'],
+  ['Ein voller Winkel hat 180°.',0,'Falsch – 360°.'],
+];
+function wfQ(){const d=pick(WF);return {kind:'mc',prompt:'Stimmt die Aussage?',text:d[0],options:['Richtig ✓','Falsch ✗'],correct:d[1]?0:1,expl:d[2]};}
+
+/* ------------------------------------------------ Modi */
+const MODES=[
+  {id:'sym',k:1,ic:'✍️',name:'Fachschreibweise',sub:'∥ ⊥ ∈ ∉ ∩ ⊾',gen:symQ},
+  {id:'ssg',k:2,ic:'📏',name:'Strecke, Strahl, Gerade',sub:'Erkennen und Begriffe',gen:ssgQ},
+  {id:'pn',k:3,ic:'➕',name:'Parallel oder normal?',sub:'Kästchen zählen',gen:pnQ},
+  {id:'shift',k:4,ic:'↗️',name:'Parallel verschieben',sub:'Tippe auf das Gitter',gen:shiftQ},
+  {id:'lage',k:5,ic:'📍',name:'Gegenseitige Lage',sub:'Punkt und Gerade, zwei Geraden',gen:lageQ},
+  {id:'dist',k:6,ic:'📐',name:'Normalabstand',sub:'Abstand finden und zählen',gen:distQ},
+  {id:'wart',k:7,ic:'🔺',name:'Winkelarten',sub:'spitz, recht, stumpf …',gen:wartQ},
+  {id:'wmess',k:8,ic:'🧭',name:'Winkel messen',sub:'Mit dem Geodreieck ablesen',gen:wmessQ},
+  {id:'wschaetz',k:8,ic:'👀',name:'Winkel schätzen',sub:'Ohne Geodreieck',gen:wschaetzQ},
+  {id:'lesen',k:9,ic:'🔎',name:'Genau lesen',sub:'Welche Zeichnung passt?',gen:lesenQ},
+  {id:'wf',k:0,ic:'✅',name:'Richtig oder falsch?',sub:'Typische Fehler',gen:wfQ},
+  {id:'mix',k:0,ic:'🏆',name:'Mini-Schularbeit',sub:'Alles gemischt',gen:()=>pick(MODES.slice(0,11)).gen()},
+];
+const N=10;let st={};
+const KEY='geo1_best';
+const best=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'{}');}catch(e){return {};}};
+function saveBest(b){try{localStorage.setItem(KEY,JSON.stringify(b));}catch(e){}}
+
+function render(html){app.innerHTML=html;window.scrollTo(0,0);}
+function menu(){
+  history.replaceState(null,'',location.pathname);
+  const b=best();
+  render('<div class="top0"><a class="sec" href="index.html">← Start</a></div><h1>🎓 Geometrie-Trainer</h1><div class="sub">Wähle ein Thema. Jede Runde hat '+N+' neue Aufgaben. Ab 8 richtigen hast du es geschafft! ⭐</div><div class="grid">'+
+    MODES.map(m=>'<button class="card" onclick="start(\''+m.id+'\')">'+(m.k?'<span class="kb">Punkt '+m.k+'</span>':'')+'<div class="ic">'+m.ic+'</div><b>'+m.name+'</b><small>'+m.sub+'</small>'+(b[m.id]!==undefined?'<div class="best">Bestwert: '+b[m.id]+' / '+N+(b[m.id]>=8?' ⭐':'')+'</div>':'')+'</button>').join('')+'</div>'+
+    '<p class="hint">Tipp: Hab dein Geodreieck und einen Zettel neben dir. Wenn etwas falsch ist, lies die Erklärung genau durch.</p>');
+}
+function start(id){const mode=MODES.find(m=>m.id===id);if(!mode)return menu();history.replaceState(null,'','#'+id);st={mode,i:0,score:0,wrong:[],q:null,done:false};next();}
+function next(){if(st.i>=N)return finish();st.q=st.mode.gen();st.done=false;showQ();}
+function showQ(){
+  const q=st.q;let body='';
+  if(q.kind==='num')body='<div class="ans"><input id="in" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" placeholder="?"><span class="unit">'+q.unit+'</span><button id="ok" onclick="checkNum()">Prüfen</button></div>';
+  else if(q.kind==='mc')body='<div class="opts '+(q.optCls||'')+'">'+q.options.map((o,i)=>'<button class="opt" id="o'+i+'" onclick="checkMC('+i+')">'+o+'</button>').join('')+'</div>';
+  render('<div class="top"><button class="sec" onclick="menu()">← Menü</button><b>'+st.mode.ic+' '+st.mode.name+'</b><span>'+(st.i+1)+' / '+N+' · ✔ '+st.score+'</span></div>'+
+    '<div class="bar"><div style="width:'+(st.i/N*100)+'%"></div></div><div class="q"><div class="p">'+q.prompt+'</div>'+(q.text?'<div class="txt">'+q.text+'</div>':'')+(q.big?'<div class="big">'+q.big+'</div>':'')+(q.fig?'<div class="figw" id="figw">'+q.fig+'</div>':'')+body+'<div id="fb"></div></div>');
+  const inp=document.getElementById('in');
+  if(inp){inp.addEventListener('keydown',e=>{if(e.key==='Enter'){st.done?next2():checkNum();}});}
+  if(q.kind==='tap'){const s=document.getElementById('tapsvg');s.addEventListener('click',tapHandler);}
+}
+function tapHandler(e){
+  if(st.done)return;const s=e.currentTarget,q=st.q;const pt=s.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;
+  const p=pt.matrixTransform(s.getScreenCTM().inverse());const x=Math.round(p.x/q.S),y=Math.round(p.y/q.S);
+  const ok=q.judge(x,y);document.getElementById('figw').innerHTML=q.reveal(x,y);feedback(ok,q.show);
+}
+function feedback(ok,shown){
+  const q=st.q;if(ok)st.score++;else st.wrong.push({p:q.prompt,shown:shown});
+  if(q.reveal&&q.kind==='num')document.getElementById('figw').innerHTML=q.reveal;
+  const fb=document.getElementById('fb');
+  fb.innerHTML='<div class="fb '+(ok?'ok':'bad')+'"><b>'+(ok?pick(['✔ Richtig!','✔ Super!','✔ Genau!','✔ Toll gemacht!']):'✗ Leider falsch.')+'</b>'+(ok?'':' Richtig wäre: <b>'+shown+'</b>')+'<div class="ex">'+q.expl+'</div></div><div class="nxw"><button id="nx" onclick="next2()">Weiter →</button></div>';
+  st.done=true;
+}
+function next2(){st.i++;next();}
+function checkNum(){
+  if(st.done)return;const inp=document.getElementById('in');const v=parseFloat(String(inp.value).replace(',','.').replace('°',''));
+  if(isNaN(v)){inp.classList.add('err');return;}
+  inp.disabled=true;document.getElementById('ok').disabled=true;
+  const ok=Math.abs(v-st.q.ans)<=st.q.tol;feedback(ok,st.q.show+(ok||st.q.tol===0?'':' (du: '+v+st.q.unit+')'));
+}
+function checkMC(i){
+  if(st.done)return;const q=st.q;
+  q.options.forEach((_,j)=>{const b=document.getElementById('o'+j);b.disabled=true;if(j===q.correct)b.classList.add('ok');else if(j===i)b.classList.add('bad');});
+  feedback(i===q.correct,q.optCls==='pics'?'Bild '+(q.correct+1):q.options[q.correct]);
+}
+function finish(){
+  const b=best();if(b[st.mode.id]===undefined||st.score>b[st.mode.id]){b[st.mode.id]=st.score;saveBest(b);}
+  const s=st.score;
+  const [em,msg]=s===N?['🏆','Perfekt – alles richtig!']:s>=8?['🎉','Sehr gut – geschafft!']:s>=6?['👍','Gut! Noch eine Runde, dann sitzt es.']:['💪','Noch nicht ganz – schau dir die Erklärungen an und versuch es nochmal.'];
+  render('<div class="res"><div class="bigem">'+em+'</div><h1>'+s+' / '+N+'</h1><p>'+msg+'</p><button onclick="start(\''+st.mode.id+'\')">Nochmal</button> <button class="sec" onclick="menu()">Menü</button>'+
+    (st.wrong.length?'<div class="rev"><b>Das war noch falsch:</b>'+st.wrong.map(w=>'<div>'+w.p+'<br>→ '+w.shown+'</div>').join('')+'</div>':'')+'</div>');
+}
+window.addEventListener('load',()=>{const h=location.hash.slice(1);if(h&&MODES.some(m=>m.id===h))start(h);else menu();});
+</script></body></html>
